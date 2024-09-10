@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: magic8_backend
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"  # Expose backend on port 8000
+    volumes:
+      - ./backend:/app  # Mount backend code
+    depends_on:
+      - model  # Wait for the AI model to be ready
+    networks:
+      - magic8ball-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: magic8_frontend
+    ports:
+      - "3000:3000"  # Expose frontend on port 3000
+    volumes:
+      - ./frontend:/app  # Mount frontend code
+    depends_on:
+      - backend  # Wait for backend to be ready
+    networks:
+      - magic8ball-network
+
+  model:
+    build:
+      context: ./model
+      dockerfile: Dockerfile
+    container_name: magic8_model
+    volumes:
+      - ./model:/app  # Mount AI model code
+    networks:
+      - magic8ball-network
+
+networks:
+  magic8ball-network:
+    driver: bridge

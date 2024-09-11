@@ -1,29 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
-
-const answers = [
-  'It is certain',
-  'It is decidedly so',
-  'Without a doubt',
-  'Yes definitely',
-  'You may rely on it',
-  'As I see it, yes',
-  'Most likely',
-  'Outlook good',
-  'Yes',
-  'Signs point to yes',
-  'Reply hazy, try again',
-  'Ask again later',
-  'Better not tell you now',
-  'Cannot predict now',
-  'Concentrate and ask again',
-  "Don't count on it",
-  'My reply is no',
-  'My sources say no',
-  'Outlook not so good',
-  'Very doubtful',
-];
+import { getMagic8BallResponse } from './api/answer';
 
 export default function Magic8Ball() {
   const [question, setQuestion] = useState('');
@@ -35,7 +13,7 @@ export default function Magic8Ball() {
   const [error, setError] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (question.trim() === '') {
       setError('Please ask a question.');
@@ -50,13 +28,18 @@ export default function Magic8Ball() {
     setError('');
     setIsShaking(true);
     setAnswer('');
-    setTimeout(() => {
-      const randomAnswer = answers[Math.floor(Math.random() * answers.length)];
-      setAnswer(randomAnswer);
-      setIsShaking(false);
-      setHistory((prev) => [{ question, answer: randomAnswer }, ...prev]);
-      setQuestion('');
-    }, 3000);
+
+    try {
+      const data = await getMagic8BallResponse(question); // Use the API function
+      setAnswer(data.response); // Set the answer from the API
+      setHistory((prev) => [{ question, answer: data.response }, ...prev]);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      setError('There was an error fetching the response. Please try again.');
+    }
+
+    setIsShaking(false);
+    setQuestion('');
   };
 
   useEffect(() => {

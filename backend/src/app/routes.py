@@ -1,24 +1,12 @@
-from typing import List
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-from app.schemas import *
-from app.crud import *
-from app.config import get_db
+from fastapi import APIRouter
+from app.schemas import Question, Response
+from app.crud import get_random_response
 
 router = APIRouter()
 
-# @router.get("/")
-# def read_root():
-#     return {"Hello": "World"}
-
-# @router.get("/health")
-# def read_item():
-#     return {"health status": "ok"}
-
-class QuestionRequest(BaseModel):
-    question: str
-
-@router.post("/get-response")
-async def get_response(request: QuestionRequest):
-    response = generate_response(request.question)
-    return {"response": response}
+# Define the POST endpoint for getting a response
+@router.post("/get-response/", response_model=Response)
+async def get_response(question: Question):
+    print(f"Question: {question.question}")
+    random_response = get_random_response()
+    return {"question": question.question, "response": random_response}

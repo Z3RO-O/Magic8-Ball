@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from app.schemas import Question, Response
-from app.crud import get_random_response
+from app.crud import getMagic8BallAIResponse
 
 router = APIRouter()
 
@@ -8,5 +8,7 @@ router = APIRouter()
 @router.post("/get-response/", response_model=Response)
 async def get_response(question: Question):
     print(f"Question: {question.question}")
-    random_response = get_random_response()
-    return {"question": question.question, "response": random_response}
+    # Generate response using LLaMA-2
+    ai_response = getMagic8BallAIResponse(question.question)
+    print(ai_response)
+    return {"question": question.question, "response": ai_response}

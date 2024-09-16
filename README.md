@@ -40,6 +40,7 @@ This project is an AI-powered Magic 8 Ball web application. The backend is built
 
 3. **Run the FastAPI server:**
     ```bash
+    cd .\src\
     uvicorn app.main:app --reload
     ```
 

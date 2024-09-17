@@ -1,23 +1,37 @@
-version: '3'
 services:
   backend:
     build:
-      context: ./backend
-    container_name: backend_service
+      context: .
+      dockerfile: Dockerfile
+      target: backend
+    working_dir: /app/backend/src
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     ports:
-      - "8000:8000"
+      - '8000:8000'
     volumes:
-      - ./backend:/app
-    environment:
-      - ENV=production
+      - ./backend:/app/backend
+    depends_on:
+      - ollama
 
   frontend:
     build:
-      context: ./frontend
-    container_name: frontend_service
+      context: .
+      dockerfile: Dockerfile
+      target: frontend
+    command: sh /app/frontend/start-frontend.sh
     ports:
-      - "3000:80"
+      - '5173:5173'
     volumes:
-      - ./frontend:/app
+      - ./frontend:/app/frontend
     depends_on:
       - backend
+
+  ollama:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: sh -c "ollama serve && ollama run phi3"
+    volumes:
+      - ./ollama:/root/.ollama
+    ports:
+      - '8080:8080'

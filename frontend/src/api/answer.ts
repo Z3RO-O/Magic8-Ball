@@ -3,17 +3,20 @@ const API_URL = 'http://127.0.0.1:8000/';
 interface Magic8BallResponse {
   question: string;
   response: string;
+  flavour?: string;
 }
 
-export const getMagic8BallResponse = async (question: string): Promise<Magic8BallResponse> => {
+export const getMagic8BallResponse = async (
+  question: string
+): Promise<Magic8BallResponse> => {
   try {
     const response = await fetch(`${API_URL}get-response/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json',
+        Accept: 'application/json',
       },
-      body: JSON.stringify({question }),
+      body: JSON.stringify({ question }),
     });
 
     if (!response.ok) {

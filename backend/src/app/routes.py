@@ -8,7 +8,7 @@ router = APIRouter()
 @router.post("/get-response/", response_model=Response)
 async def get_response(question: Question):
     print(f"Question: {question.question}")
-    # Generate response using LLaMA-2
+    # Generate response using Phi-3
     ai_response = getMagic8BallAIResponse(question.question)
-    print(ai_response)
+    print(ai_response, "\nFlavour: ", question.flavour)
     return {"question": question.question, "response": ai_response}

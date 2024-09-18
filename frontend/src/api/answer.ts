@@ -10,13 +10,12 @@ export const getMagic8BallResponse = async (
   question: string
 ): Promise<Magic8BallResponse> => {
   try {
-    const response = await fetch(`${API_URL}get-response/`, {
-      method: 'POST',
+    const response = await fetch(`${API_URL}get-response/?question=${encodeURIComponent(question)}`, {
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        Accept: 'application/json',
+        'Accept': 'application/json',
       },
-      body: JSON.stringify({ question }),
     });
 
     if (!response.ok) {

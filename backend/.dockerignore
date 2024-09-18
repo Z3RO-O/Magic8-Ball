@@ -1,0 +1,10 @@
+node_modules
+venv
+.venv
+env
+.env
+npm-debug.log
+build
+.git
+*.md
+.gitignore

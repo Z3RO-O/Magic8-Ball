@@ -10,4 +10,5 @@ async def get_response(question: str):
     print(f"Question: {question}")
     # Generate response using Phi-3
     ai_response = getMagic8BallAIResponse(question)
+    print(f"AI Response: {ai_response}")
     return {"question": question, "response": ai_response}

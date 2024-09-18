@@ -26,11 +26,15 @@ services:
     ports: 
       - 11434:11434
     volumes:
-      - ./ollama:/app/ollama
+      - test-vol:/ollama
     networks:
       - testing-network
-    entrypoint: ['/usr/bin/bash', 'app/ollama/pull-phi3.sh']
+    entrypoint: ['/usr/bin/bash', '/pull-phi3.sh']
 
 networks:
   testing-network:
     driver: bridge
+
+volumes:
+  test-vol:
+    driver: local

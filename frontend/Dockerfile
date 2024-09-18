@@ -2,26 +2,16 @@
 FROM node:18-alpine
 
 # Set working directory
-WORKDIR /app
+WORKDIR /app/frontend
 
 # Copy package.json and yarn.lock
-COPY package.json yarn.lock ./
+COPY ./package.json /app/frontend
 
 # Install dependencies
-RUN yarn install
+RUN npm i
 
 # Copy the rest of the application
 COPY . .
 
-# Build the React app
-RUN yarn build
-
-# Use nginx to serve the build
-FROM nginx:alpine
-COPY --from=0 /app/dist /usr/share/nginx/html
-
-# Expose port 80
-EXPOSE 80
-
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Start application
+CMD ["npm", "run", "dev"]

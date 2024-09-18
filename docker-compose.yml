@@ -1,37 +1,36 @@
 services:
   backend:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: backend
-    working_dir: /app/backend/src
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    build: backend
     ports:
-      - '8000:8000'
+      - 8000:8000
     volumes:
       - ./backend:/app/backend
     depends_on:
       - ollama
+    networks:
+      - testing-network
 
   frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: frontend
-    command: sh /app/frontend/start-frontend.sh
+    build: frontend
     ports:
-      - '5173:5173'
+      - 5173:5173
     volumes:
       - ./frontend:/app/frontend
     depends_on:
       - backend
+    networks:
+      - testing-network
 
   ollama:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: sh -c "ollama serve && ollama run phi3"
+    build: ollama
+    ports: 
+      - 11434:11434
     volumes:
-      - ./ollama:/root/.ollama
-    ports:
-      - '8080:8080'
+      - ./ollama:/app/ollama
+    networks:
+      - testing-network
+    entrypoint: ['/usr/bin/bash', 'app/ollama/pull-phi3.sh']
+
+networks:
+  testing-network:
+    driver: bridge

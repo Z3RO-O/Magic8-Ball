@@ -1,3 +1,3 @@
 FROM ollama/ollama
 
-COPY ./pull-phi3.sh /pull-phi3.sh
+COPY ./pull-llama3.sh /pull-llama3.sh

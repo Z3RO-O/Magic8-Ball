@@ -4,9 +4,9 @@ pid=$!
 
 sleep 5
 
-echo "Pulling phi3 model"
+echo "Pulling llama3.1:8b model"
 
-ollama pull phi3
+ollama pull llama3.1:8b
 
 echo "Pull Completed"
 

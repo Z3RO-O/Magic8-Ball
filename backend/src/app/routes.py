@@ -1,8 +1,12 @@
 from fastapi import APIRouter
-from src.app.schemas import Question
-from src.app.crud import getMagic8BallAIResponse
+from app.schemas import Question
+from app.crud import getMagic8BallAIResponse
 
 router = APIRouter()
+
+@router.get("/")
+async def root():
+    return {"message": "Hello World"}
 
 # Define the POST endpoint for getting a response
 @router.get("/get-response/")

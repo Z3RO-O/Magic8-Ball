@@ -7,8 +7,27 @@ services:
       - ./backend:/app/backend
     depends_on:
       - ollama
+      - db
     networks:
       - testing-network
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@db/magic_db
+
+  db:
+      image: postgres:latest
+      environment:
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: password
+        POSTGRES_DB: magic_db
+      volumes:
+        - pgdb:/var/lib/postgresql/data/
+      ports:
+        - "5432:5432"
+      healthcheck:
+        test: ["CMD", "pg_isready", "-U", "postgres"]
+        interval: 30s
+        timeout: 10s
+        retries: 5
 
   frontend:
     build: frontend
@@ -29,7 +48,7 @@ services:
       - test-vol:/ollama
     networks:
       - testing-network
-    entrypoint: ['/usr/bin/bash', '/pull-phi3.sh']
+    entrypoint: ['/usr/bin/bash', '/pull-llama3.sh']
 
 networks:
   testing-network:
@@ -38,3 +57,4 @@ networks:
 volumes:
   test-vol:
     driver: local
+  pgdb:

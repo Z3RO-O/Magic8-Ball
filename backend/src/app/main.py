@@ -1,13 +1,12 @@
 from fastapi import FastAPI
-from src.app.config import *
-from src.app.schemas import *
-from src.app.routes import *
+from app.config import *
+from app.schemas import *
+from app.routes import *
 from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI(
-    title=settings.APP_NAME,
-    version=settings.VERSION
-)
+app = FastAPI()
+
+Base.metadata.create_all(bind=engine)
 
 # Add CORS middleware to allow requests from frontend
 app.add_middleware(

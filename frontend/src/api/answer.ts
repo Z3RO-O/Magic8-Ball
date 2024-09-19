@@ -7,10 +7,11 @@ interface Magic8BallResponse {
 }
 
 export const getMagic8BallResponse = async (
-  question: string
+  question: string,
+  flavour = 'Classic',
 ): Promise<Magic8BallResponse> => {
   try {
-    const response = await fetch(`${API_URL}get-response/?question=${encodeURIComponent(question)}`, {
+    const response = await fetch(`${API_URL}get-response/?question=${encodeURIComponent(question)}&flavour=${encodeURIComponent(flavour)}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

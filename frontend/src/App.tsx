@@ -3,29 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, Moon, Sun, Palette, Sparkles } from 'lucide-react';
 import { getMagic8BallResponse } from './api/answer';
 
-const dummyResponses = [
-  'It is certain',
-  'It is decidedly so',
-  'Without a doubt',
-  'Yes definitely',
-  'You may rely on it',
-  'As I see it, yes',
-  'Most likely',
-  'Outlook good',
-  'Yes',
-  'Signs point to yes',
-  'Reply hazy, try again',
-  'Ask again later',
-  'Better not tell you now',
-  'Cannot predict now',
-  'Concentrate and ask again',
-  "Don't count on it",
-  'My reply is no',
-  'My sources say no',
-  'Outlook not so good',
-  'Very doubtful',
-];
-
 const themes = [
   {
     name: 'Default',
@@ -243,9 +220,29 @@ export default function Magic8Ball() {
       // Commented out API call
       // const data = await getMagic8BallResponse(question);
       // Use dummy response instead
-      const data = await getMagic8BallResponse(question); // Use the API function
-      setAnswer(data.response); // Set the answer from the API
-      setHistory((prev) => [{ question, answer: data.response }, ...prev]);
+      const data = await getMagic8BallResponse(question, currentFlavour.name); // Use the API function
+
+      // Function to clip text at a specific delimiter or word limit
+      function clipResponse(text:string, delimiter:string, wordLimit:number) {
+          // Check if the delimiter is present
+          const delimiterIndex = text.indexOf(delimiter);
+          let clippedText;
+
+          if (delimiterIndex !== -1) {
+              // If delimiter is found, clip the text at the delimiter
+              clippedText = text.substring(0, delimiterIndex).trim();
+          } else {
+              // If delimiter is not found, clip the text at word limit
+              const words = text.split(/\s+/); // Split text by whitespace
+              clippedText = words.slice(0, wordLimit).join(' '); // Join the first `wordLimit` words
+          }
+
+          return clippedText;
+      }
+
+
+
+      const magicAnswer = clipResponse(data.response, '---', 50);
 
       // const dummyResponse =
       //   dummyResponses[Math.floor(Math.random() * dummyResponses.length)];
@@ -255,8 +252,8 @@ export default function Magic8Ball() {
       // Ensure a minimum delay of 2 seconds
       await new Promise((resolve) => setTimeout(resolve, remainingTime));
 
-      setAnswer(data.response);
-      setHistory((prev) => [{ question, answer: data.response }, ...prev]);
+      setAnswer(magicAnswer);
+      setHistory((prev) => [{ question, answer: magicAnswer }, ...prev]);
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       setError('There was an error fetching the response. Please try again.');
@@ -478,7 +475,7 @@ export default function Magic8Ball() {
             }}
           >
             <motion.div
-              className={`w-[150px] h-[150px] rounded-full flex items-center justify-center relative z-10`}
+              className={`w-[250px] h-[250px] rounded-full flex items-center justify-center relative z-10`}
               style={{
                 background: `radial-gradient(circle at 40% 40%, ${
                   isDarkMode ? '#4a4a4a' : '#6a6a6a'

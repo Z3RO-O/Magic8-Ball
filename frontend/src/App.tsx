@@ -6,36 +6,106 @@ import { getMagic8BallResponse } from './api/answer';
 const themes = [
   {
     name: 'Default',
-    primary: 'blue',
-    secondary: 'indigo',
+    primary: {
+      bg500: 'bg-blue-500',
+      bg600: 'bg-blue-600',
+      bg700: 'bg-blue-700',
+      text500: 'text-blue-500',
+      text600: 'text-blue-600',
+      text700: 'text-blue-700',
+    },
+    secondary: {
+      bg500: 'bg-indigo-500',
+      bg600: 'bg-indigo-600',
+      bg700: 'bg-indigo-700',
+      text500: 'text-indigo-500',
+      text600: 'text-indigo-600',
+      text700: 'text-indigo-700',
+    },
     bgDark: 'from-gray-900 to-gray-800',
     bgLight: 'from-blue-50 to-indigo-50',
   },
   {
     name: 'Emerald',
-    primary: 'emerald',
-    secondary: 'green',
+    primary: {
+      bg500: 'bg-emerald-500',
+      bg600: 'bg-emerald-600',
+      bg700: 'bg-emerald-700',
+      text500: 'text-emerald-500',
+      text600: 'text-emerald-600',
+      text700: 'text-emerald-700',
+    },
+    secondary: {
+      bg500: 'bg-green-500',
+      bg600: 'bg-green-600',
+      bg700: 'bg-green-700',
+      text500: 'text-green-500',
+      text600: 'text-green-600',
+      text700: 'text-green-700',
+    },
     bgDark: 'from-emerald-900 to-green-800',
     bgLight: 'from-emerald-50 to-green-50',
   },
   {
     name: 'Rose',
-    primary: 'rose',
-    secondary: 'pink',
+    primary: {
+      bg500: 'bg-rose-500',
+      bg600: 'bg-rose-600',
+      bg700: 'bg-rose-700',
+      text500: 'text-rose-500',
+      text600: 'text-rose-600',
+      text700: 'text-rose-700',
+    },
+    secondary: {
+      bg500: 'bg-pink-500',
+      bg600: 'bg-pink-600',
+      bg700: 'bg-pink-700',
+      text500: 'text-pink-500',
+      text600: 'text-pink-600',
+      text700: 'text-pink-700',
+    },
     bgDark: 'from-rose-900 to-pink-800',
     bgLight: 'from-rose-50 to-pink-50',
   },
   {
     name: 'Amber',
-    primary: 'amber',
-    secondary: 'yellow',
+    primary: {
+      bg500: 'bg-amber-500',
+      bg600: 'bg-amber-600',
+      bg700: 'bg-amber-700',
+      text500: 'text-amber-500',
+      text600: 'text-amber-600',
+      text700: 'text-amber-700',
+    },
+    secondary: {
+      bg500: 'bg-yellow-500',
+      bg600: 'bg-yellow-600',
+      bg700: 'bg-yellow-700',
+      text500: 'text-yellow-500',
+      text600: 'text-yellow-600',
+      text700: 'text-yellow-700',
+    },
     bgDark: 'from-amber-900 to-yellow-800',
     bgLight: 'from-amber-50 to-yellow-50',
   },
   {
     name: 'Violet',
-    primary: 'violet',
-    secondary: 'purple',
+    primary: {
+      bg500: 'bg-violet-500',
+      bg600: 'bg-violet-600',
+      bg700: 'bg-violet-700',
+      text500: 'text-violet-500',
+      text600: 'text-violet-600',
+      text700: 'text-violet-700',
+    },
+    secondary: {
+      bg500: 'bg-purple-500',
+      bg600: 'bg-purple-600',
+      bg700: 'bg-purple-700',
+      text500: 'text-purple-500',
+      text600: 'text-purple-600',
+      text700: 'text-purple-700',
+    },
     bgDark: 'from-violet-900 to-purple-800',
     bgLight: 'from-violet-50 to-purple-50',
   },
@@ -180,6 +250,23 @@ const flavours = [
   },
 ];
 
+function clipResponse(text: string, delimiter: string, wordLimit: number) {
+  // Check if the delimiter is present
+  const delimiterIndex = text.indexOf(delimiter);
+  let clippedText;
+
+  if (delimiterIndex !== -1) {
+    // If delimiter is found, clip the text at the delimiter
+    clippedText = text.substring(0, delimiterIndex).trim();
+  } else {
+    // If delimiter is not found, clip the text at word limit
+    const words = text.split(/\s+/); // Split text by whitespace
+    clippedText = words.slice(0, wordLimit).join(' '); // Join the first `wordLimit` words
+  }
+
+  return clippedText;
+}
+
 export default function Magic8Ball() {
   const [question, setQuestion] = useState('');
   const [answer, setAnswer] = useState('');
@@ -223,25 +310,6 @@ export default function Magic8Ball() {
       const data = await getMagic8BallResponse(question, currentFlavour.name); // Use the API function
 
       // Function to clip text at a specific delimiter or word limit
-      function clipResponse(text:string, delimiter:string, wordLimit:number) {
-          // Check if the delimiter is present
-          const delimiterIndex = text.indexOf(delimiter);
-          let clippedText;
-
-          if (delimiterIndex !== -1) {
-              // If delimiter is found, clip the text at the delimiter
-              clippedText = text.substring(0, delimiterIndex).trim();
-          } else {
-              // If delimiter is not found, clip the text at word limit
-              const words = text.split(/\s+/); // Split text by whitespace
-              clippedText = words.slice(0, wordLimit).join(' '); // Join the first `wordLimit` words
-          }
-
-          return clippedText;
-      }
-
-
-
       const magicAnswer = clipResponse(data.response, '---', 50);
 
       // const dummyResponse =
@@ -345,8 +413,8 @@ export default function Magic8Ball() {
             <div className="relative" ref={themeMenuRef}>
               <button
                 onClick={toggleThemeMenu}
-                className={`p-2 rounded-full bg-${currentTheme.primary}-${
-                  isDarkMode ? '600' : '400'
+                className={`p-2 rounded-full ${
+                  currentTheme.primary.bg500
                 } text-${
                   isDarkMode ? 'gray-200' : 'gray-800'
                 } hover:bg-opacity-80 transition-colors`}
@@ -392,9 +460,7 @@ export default function Magic8Ball() {
             </div>
             <button
               onClick={toggleDarkMode}
-              className={`p-2 rounded-full bg-${currentTheme.primary}-${
-                isDarkMode ? '600' : '400'
-              } text-${
+              className={`p-2 rounded-full ${currentTheme.primary.bg500} text-${
                 isDarkMode ? 'gray-200' : 'gray-800'
               } hover:bg-opacity-80 transition-colors`}
               aria-label={
@@ -407,9 +473,7 @@ export default function Magic8Ball() {
           <div className="relative" ref={flavourMenuRef}>
             <button
               onClick={toggleFlavourMenu}
-              className={`p-2 rounded-full bg-${currentTheme.primary}-${
-                isDarkMode ? '600' : '400'
-              } text-${
+              className={`p-2 rounded-full ${currentTheme.primary.bg500} text-${
                 isDarkMode ? 'gray-200' : 'gray-800'
               } hover:bg-opacity-80 transition-colors`}
               aria-label="Open flavour menu"
@@ -565,7 +629,7 @@ export default function Magic8Ball() {
               />
               <motion.button
                 type="submit"
-                className={`px-6 py-2 bg-${currentTheme.primary}-600 rounded-md hover:bg-${currentTheme.primary}-700 transition-colors focus:outline-none focus:ring-2 focus:ring-${currentTheme.primary}-500 focus:ring-opacity-50 text-gray-100 font-semibold disabled:opacity-50`}
+                className={`px-6 py-2 ${currentTheme.primary.bg600} rounded-md hover:${currentTheme.primary.bg700} transition-colors focus:outline-none focus:ring-2 focus:ring-${currentTheme.primary}-500 focus:ring-opacity-50 text-gray-100 font-semibold disabled:opacity-50`}
                 whileTap={{ scale: 0.95 }}
                 disabled={isLoading}
               >
@@ -582,8 +646,8 @@ export default function Magic8Ball() {
           <h2
             className={`text-xl font-bold mb-4 ${
               isDarkMode
-                ? `text-${currentTheme.primary}-300`
-                : `text-${currentTheme.primary}-700`
+                ? `${currentTheme.primary.text500}`
+                : `${currentTheme.primary.text700}`
             }`}
           >
             History
@@ -604,13 +668,13 @@ export default function Magic8Ball() {
                 <p
                   className={`font-semibold ${
                     isDarkMode
-                      ? `text-${currentTheme.secondary}-300`
-                      : `text-${currentTheme.secondary}-700`
+                      ? `${currentTheme.secondary.text500}`
+                      : `${currentTheme.secondary.text700}`
                   }`}
                 >
                   {item.question}
                 </p>
-                <p className={`text-${currentTheme.primary}-400 italic`}>
+                <p className={`${currentTheme.primary.text500} italic`}>
                   {item.answer}
                 </p>
               </motion.div>

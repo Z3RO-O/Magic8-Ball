@@ -1,4 +1,3 @@
-from fastapi import FastAPI, Response
 from sqlalchemy.orm import Session
 from app.models import *
 import requests
@@ -54,6 +53,25 @@ def getMagic8BallAIResponse(question:str,flavour:str):
     })
 
     json_res = res.json()['response']
-    
+    # json_res = "Yes"
     return json_res
 
+def create_response(db: Session, question: str, response: str, flavour: str):
+    db_response = EightBall(question=question, response=response, flavour=flavour)
+    db.add(db_response)
+    db.commit()
+    db.refresh(db_response)
+    print(f"Response created")
+
+# Function to delete a specific response by ID
+def delete_response(db: Session, response_id: int):
+    db_response = db.query(EightBall).filter(EightBall.id == response_id).first()
+    if db_response:
+        db.delete(db_response)
+        db.commit()
+    return db_response
+
+# Function to delete all responses
+def delete_all_responses(db: Session):
+    db.query(EightBall).delete()
+    db.commit()

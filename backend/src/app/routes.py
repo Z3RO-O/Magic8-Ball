@@ -16,16 +16,20 @@ async def get_history(db: Session = Depends(get_db)):
 
 # Define the POST endpoint for getting a response
 @router.get("/get-response/")
-async def get_response(question: str, flavour: str,db: Session = Depends(get_db)):
+async def get_response(question: str, flavour: str, db: Session = Depends(get_db)):
     print(f"Question: {question}")
     print(f"Flavour: {flavour}")
+    
     # Generate response using Phi-3
-    response = getMagic8BallAIResponse(question,flavour)
+    response = getMagic8BallAIResponse(question, flavour)
     print(f"response: {response}")
-    # Save the response to the database
-    create_response(db, question, response, flavour)
-    print(f"Response saved to database")
-    return {"response": response}
+    
+    # Save the response to the database and get the ID
+    response_id = create_response(db, question, response, flavour)
+    print(f"Response saved to database with ID: {response_id}")
+    
+    return {"response": response, "id": response_id}  # Return both response and ID
+
 
 # Delete a specific response by ID
 @router.delete("/delete-response/{response_id}")

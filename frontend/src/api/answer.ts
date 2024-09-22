@@ -1,6 +1,7 @@
-const API_URL = 'http://127.0.0.1:8000/';
+import { API_URL } from '../config';
 
 interface Magic8BallResponse {
+  id: number;
   question: string;
   response: string;
   flavour?: string;
@@ -8,16 +9,21 @@ interface Magic8BallResponse {
 
 export const getMagic8BallResponse = async (
   question: string,
-  flavour = 'Classic',
+  flavour = 'Classic'
 ): Promise<Magic8BallResponse> => {
   try {
-    const response = await fetch(`${API_URL}get-response/?question=${encodeURIComponent(question)}&flavour=${encodeURIComponent(flavour)}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-    });
+    const response = await fetch(
+      `${API_URL}get-response/?question=${encodeURIComponent(
+        question
+      )}&flavour=${encodeURIComponent(flavour)}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+      }
+    );
 
     if (!response.ok) {
       throw new Error('Failed to fetch response');

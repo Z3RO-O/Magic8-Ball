@@ -1,5 +1,7 @@
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from app.models import *
+from .config import MAX_QUESTION_LENGTH, MAX_RESPONSE_LENGTH, MAX_FLAVOUR_LENGTH
 import requests
 import random
 
@@ -56,12 +58,33 @@ def getMagic8BallAIResponse(question:str,flavour:str):
     # json_res = "Yes"
     return json_res
 
-def create_response(db: Session, question: str, response: str, flavour: str):
+
+def create_response(db: Session, question: str, response: str, flavour: str) -> int:
+    if not question or not response or not flavour:
+        raise ValueError("Question, response, and flavour cannot be empty.")
+    
+    if len(question) > MAX_QUESTION_LENGTH:
+        raise ValueError(f"Question cannot exceed {MAX_QUESTION_LENGTH} characters.")
+    
+    if len(response) > MAX_RESPONSE_LENGTH:
+        raise ValueError(f"Response cannot exceed {MAX_RESPONSE_LENGTH} characters.")
+    
+    if len(flavour) > MAX_FLAVOUR_LENGTH:
+        raise ValueError(f"Flavour cannot exceed {MAX_FLAVOUR_LENGTH} characters.")
+
     db_response = EightBall(question=question, response=response, flavour=flavour)
-    db.add(db_response)
-    db.commit()
-    db.refresh(db_response)
-    print(f"Response created")
+    
+    try:
+        db.add(db_response)
+        db.commit()
+        db.refresh(db_response)
+        print("Response created")
+        return db_response.id  # Return the ID of the created response
+    except IntegrityError:
+        db.rollback()
+        raise ValueError("Failed to create response due to integrity error.")
+
+
 
 # Function to delete a specific response by ID
 def delete_response(db: Session, response_id: int):

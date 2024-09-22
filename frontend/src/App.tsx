@@ -1,11 +1,7 @@
-import Magic8Ball from "./components/MagicBall"
+import Magic8Ball from './components/MagicBall';
 
 const App = () => {
-  return (
-    <div>
-      <Magic8Ball />
-    </div>
-  )
-}
+  return <Magic8Ball />;
+};
 
-export default App
+export default App;

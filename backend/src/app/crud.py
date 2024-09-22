@@ -59,7 +59,7 @@ def getMagic8BallAIResponse(question:str,flavour:str):
     return json_res
 
 
-def create_response(db: Session, question: str, response: str, flavour: str):
+def create_response(db: Session, question: str, response: str, flavour: str) -> int:
     if not question or not response or not flavour:
         raise ValueError("Question, response, and flavour cannot be empty.")
     
@@ -79,9 +79,11 @@ def create_response(db: Session, question: str, response: str, flavour: str):
         db.commit()
         db.refresh(db_response)
         print("Response created")
+        return db_response.id  # Return the ID of the created response
     except IntegrityError:
         db.rollback()
         raise ValueError("Failed to create response due to integrity error.")
+
 
 
 # Function to delete a specific response by ID

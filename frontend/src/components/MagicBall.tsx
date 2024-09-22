@@ -1,26 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Loader2, Moon, Sun, Palette, Sparkles } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Moon, Sun, Palette, Sparkles } from 'lucide-react';
+
 import { getMagic8BallResponse } from '../api/answer';
 import { themes } from '../constants/theme';
 import { flavours } from '../constants/flavour';
-
-function clipResponse(text: string, delimiter: string, wordLimit: number) {
-  // Check if the delimiter is present
-  const delimiterIndex = text.indexOf(delimiter);
-  let clippedText;
-
-  if (delimiterIndex !== -1) {
-    // If delimiter is found, clip the text at the delimiter
-    clippedText = text.substring(0, delimiterIndex).trim();
-  } else {
-    // If delimiter is not found, clip the text at word limit
-    const words = text.split(/\s+/); // Split text by whitespace
-    clippedText = words.slice(0, wordLimit).join(' '); // Join the first `wordLimit` words
-  }
-
-  return clippedText;
-}
+import { clipResponse } from '../constants/helpers';
+import History from './History';
+import MagicBallAnimation from './MagicBallAnimation';
 
 export default function Magic8Ball() {
   const [question, setQuestion] = useState('');
@@ -59,16 +46,10 @@ export default function Magic8Ball() {
 
     try {
       const startTime = Date.now();
-      // Commented out API call
-      // const data = await getMagic8BallResponse(question);
-      // Use dummy response instead
       const data = await getMagic8BallResponse(question, currentFlavour.name); // Use the API function
 
-      // Function to clip text at a specific delimiter or word limit
       const magicAnswer = clipResponse(data.response, '---', 50);
 
-      // const dummyResponse =
-      //   dummyResponses[Math.floor(Math.random() * dummyResponses.length)];
       const elapsedTime = Date.now() - startTime;
       const remainingTime = Math.max(0, 2000 - elapsedTime);
 
@@ -76,7 +57,10 @@ export default function Magic8Ball() {
       await new Promise((resolve) => setTimeout(resolve, remainingTime));
 
       setAnswer(magicAnswer);
-      setHistory((prev) => [{ question, answer: magicAnswer }, ...prev]);
+      setHistory((prev) => [
+        { question, answer: magicAnswer, id: data.id },
+        ...prev,
+      ]);
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       setError('There was an error fetching the response. Please try again.');
@@ -162,9 +146,9 @@ export default function Magic8Ball() {
         </motion.div>
       </div>
 
-      <div className="w-full max-w-md flex flex-col items-center justify-between min-h-screen py-10 px-4 relative z-10">
+      <div className="w-full max-w-md flex flex-col items-center justify-between min-h-screen py-10 px-4 relative z-20">
         <div className="w-full flex justify-between mb-8">
-          <div className="flex space-x-2">
+          <div className="flex z-20 space-x-2">
             <div className="relative" ref={themeMenuRef}>
               <button
                 onClick={toggleThemeMenu}
@@ -225,7 +209,8 @@ export default function Magic8Ball() {
               {isDarkMode ? <Sun size={24} /> : <Moon size={24} />}
             </button>
           </div>
-          <div className="relative" ref={flavourMenuRef}>
+
+          <div className="relative z-20" ref={flavourMenuRef}>
             <button
               onClick={toggleFlavourMenu}
               className={`p-2 rounded-full ${currentTheme.primary.bg500} text-${
@@ -242,7 +227,7 @@ export default function Magic8Ball() {
                 } ring-1 ring-black ring-opacity-5 z-10`}
               >
                 <div
-                  className="py-1"
+                  className="py-1 z-20"
                   role="menu"
                   aria-orientation="vertical"
                   aria-labelledby="options-menu"
@@ -251,7 +236,7 @@ export default function Magic8Ball() {
                     <button
                       key={flavour.name}
                       onClick={() => selectFlavour(flavour)}
-                      className={`block px-4 py-2 text-sm ${
+                      className={`block z-20 px-4 py-2 text-sm ${
                         isDarkMode
                           ? 'text-gray-300 hover:bg-gray-700'
                           : 'text-gray-700 hover:bg-gray-100'
@@ -272,97 +257,12 @@ export default function Magic8Ball() {
             )}
           </div>
         </div>
-        <div className="flex-grow flex flex-col items-center justify-center w-full mb-8">
-          <motion.div
-            className={`w-[350px] h-[350px] rounded-full flex items-center justify-center relative overflow-hidden mb-10`}
-            style={{
-              background: 'radial-gradient(circle at 30% 30%, #1a1a1a, #000)',
-              boxShadow: `0 0 50px rgba(0, 0, 0, 0.5), inset 0 0 30px rgba(0, 0, 0, 0.5)`,
-            }}
-            animate={
-              isShaking
-                ? {
-                    rotate: [0, -5, 5, -5, 5, 0],
-                    scale: [1, 1.05, 1, 1.05, 1],
-                  }
-                : {}
-            }
-            transition={{
-              duration: 0.5,
-              repeat: isShaking ? Infinity : 0,
-              repeatDelay: 0.1,
-            }}
-          >
-            <motion.div
-              className={`w-[250px] h-[250px] rounded-full flex items-center justify-center relative z-10`}
-              style={{
-                background: `radial-gradient(circle at 40% 40%, ${
-                  isDarkMode ? '#4a4a4a' : '#6a6a6a'
-                }, ${isDarkMode ? '#2a2a2a' : '#4a4a4a'})`,
-                boxShadow: `0 0 20px rgba(0, 0, 0, 0.3), inset 0 0 10px rgba(0, 0, 0, 0.5)`,
-              }}
-              animate={isShaking ? { scale: [1, 0.9, 1, 0.9, 1] } : {}}
-              transition={{
-                duration: 0.5,
-                repeat: isShaking ? Infinity : 0,
-                repeatDelay: 0.1,
-              }}
-            >
-              <AnimatePresence mode="wait">
-                {isShaking ? (
-                  <motion.div
-                    key="loader"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="absolute inset-0 flex items-center justify-center"
-                  >
-                    <Loader2 className="animate-spin text-gray-300 w-12 h-12" />
-                  </motion.div>
-                ) : answer ? (
-                  <motion.div
-                    key="answer"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="absolute inset-0 flex items-center justify-center text-center p-4"
-                  >
-                    <motion.p
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ duration: 0.5 }}
-                      className="text-lg font-bold text-gray-100"
-                    >
-                      {answer.split('').map((char, index) => (
-                        <motion.span
-                          key={index}
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{
-                            duration: 0.5,
-                            delay: index * 0.05,
-                          }}
-                        >
-                          {char}
-                        </motion.span>
-                      ))}
-                    </motion.p>
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="eight"
-                    initial={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="text-6xl font-bold text-gray-100"
-                  >
-                    8
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
-            <div className="absolute inset-0 bg-gradient-radial from-transparent to-black opacity-50 rounded-full pointer-events-none" />
-          </motion.div>
-        </div>
+
+        <MagicBallAnimation
+          isShaking={isShaking}
+          answer={answer}
+          isDarkMode={isDarkMode}
+        />
 
         <div className="w-full">
           <form onSubmit={handleSubmit} className="mb-6">
@@ -396,47 +296,12 @@ export default function Magic8Ball() {
         </div>
       </div>
 
-      {history.length > 0 && (
-        <div className="w-full max-w-md px-4 pb-10">
-          <h2
-            className={`text-xl font-bold mb-4 ${
-              isDarkMode
-                ? `${currentTheme.primary.text500}`
-                : `${currentTheme.primary.text700}`
-            }`}
-          >
-            History
-          </h2>
-          <div className="space-y-4">
-            {history.map((item, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.1 }}
-                className={`${
-                  isDarkMode
-                    ? `bg-${currentTheme.secondary}-900/50`
-                    : `bg-${currentTheme.secondary}-100/50`
-                } backdrop-blur-sm p-4 rounded-md`}
-              >
-                <p
-                  className={`font-semibold ${
-                    isDarkMode
-                      ? `${currentTheme.secondary.text500}`
-                      : `${currentTheme.secondary.text700}`
-                  }`}
-                >
-                  {item.question}
-                </p>
-                <p className={`${currentTheme.primary.text500} italic`}>
-                  {item.answer}
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      )}
+      <History
+        history={history}
+        isDarkMode={isDarkMode}
+        currentTheme={currentTheme}
+        setHistory={setHistory}
+      />
     </div>
   );
 }

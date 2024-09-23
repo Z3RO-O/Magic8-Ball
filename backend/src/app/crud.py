@@ -78,8 +78,8 @@ def create_response(db: Session, question: str, response: str, flavour: str) -> 
         db.add(db_response)
         db.commit()
         db.refresh(db_response)
-        print("Response created")
-        return db_response.id  # Return the ID of the created response
+        print("Response created", db_response)
+        return db_response.id  # type: ignore # Return the ID of the created response as an integer
     except IntegrityError:
         db.rollback()
         raise ValueError("Failed to create response due to integrity error.")

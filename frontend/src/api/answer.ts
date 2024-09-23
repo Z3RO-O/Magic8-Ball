@@ -12,18 +12,14 @@ export const getMagic8BallResponse = async (
   flavour = 'Classic'
 ): Promise<Magic8BallResponse> => {
   try {
-    const response = await fetch(
-      `${API_URL}get-response/?question=${encodeURIComponent(
-        question
-      )}&flavour=${encodeURIComponent(flavour)}`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-      }
-    );
+    const response = await fetch(`${API_URL}get-response/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify({ question, flavour }),
+    });
 
     if (!response.ok) {
       throw new Error('Failed to fetch response');

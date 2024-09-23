@@ -21,15 +21,8 @@ def db_session():
     # Drop all tables after test
     Base.metadata.drop_all(bind=engine)
 
+
 @pytest.fixture(scope="module")
 def client():
-    """Create a new FastAPI test client for each test module."""
-    def _get_test_db():
-        try:
-            yield db_session
-        finally:
-            pass
-
-    app.dependency_overrides[get_db] = _get_test_db
     with TestClient(app) as client:
         yield client

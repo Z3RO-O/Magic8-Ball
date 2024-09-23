@@ -3,8 +3,9 @@ from typing import Optional
 
 class Question(BaseModel):
     question: str
-    flavour: Optional[str] = None
+    flavour: str
 
 class Response(BaseModel):
+    id: int
     question: str
     response: str

@@ -1,12 +1,12 @@
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from app.config import Base  # Assuming Base is imported from your models configuration
+from fastapi.testclient import TestClient
+from app.config import Base, get_db  
+from app.main import app  
 
-# Test database URL
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
 
-# Setup for testing
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
@@ -21,3 +21,15 @@ def db_session():
     # Drop all tables after test
     Base.metadata.drop_all(bind=engine)
 
+@pytest.fixture(scope="module")
+def client():
+    """Create a new FastAPI test client for each test module."""
+    def _get_test_db():
+        try:
+            yield db_session
+        finally:
+            pass
+
+    app.dependency_overrides[get_db] = _get_test_db
+    with TestClient(app) as client:
+        yield client
